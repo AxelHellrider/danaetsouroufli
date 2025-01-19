@@ -50,13 +50,14 @@ export default {
 
       // Create 3D objects
       const objects = [];
+      let objCount = window.innerWidth > 1024?200:70
       const objectTypes = [
         { geometry: new THREE.TorusGeometry(10, 4.3, 15, 15), color: 0xfb6347 },
         { geometry: new THREE.BoxGeometry(12, 12, 12), color: 0x00fcfc },
         { geometry: new THREE.ConeGeometry(12, 12, 4), color: 0xffcc00 },
       ];
 
-      for (let i = 0; i < 200; i++) {
+      for (let i = 0; i < objCount; i++) {
         const { geometry, color } = objectTypes[Math.floor(Math.random() * objectTypes.length)];
         const material = new THREE.MeshBasicMaterial({ color, wireframe: true });
         const mesh = new THREE.Mesh(geometry, material);
@@ -81,25 +82,26 @@ export default {
 
       // Create 2D sine wave lines
       const lines = [];
-      const lineCount = 10; // Reduce the number of lines to simplify
+      let lineCount = window.innerWidth > 1024?10:5; // Reduce the number of lines to simplify
+      let lineCamOffset = window.innerWidth > 1024?180:190;
 
       for (let i = 0; i < lineCount; i++) {
         const points = [];
         const amplitude = Math.random() * 5; // Increase amplitude for more intensity
         const frequency = Math.random() * 3 + 0.2; // Higher frequency for tighter waves
-        const offsetX = Math.random() * 200; // Offset for wave motion
+        const offsetX = Math.random() * window.innerWidth / 2; // Offset for wave motion
         const offsetY = Math.random() * window.innerHeight / lineCount; // Random Y position
 
         // Generate sine wave points with more intensity
         for (let j = 0; j < window.innerWidth; j++) {
           const x = j - window.innerWidth / 2; // Centering the wave
           const y = Math.sin(frequency * (x + offsetX)) * amplitude + offsetY; // Adding random vertical offset
-          points.push(new THREE.Vector3(x, y, 190)); // 100 for z position (depth)
+          points.push(new THREE.Vector3(x, y, lineCamOffset)); // 100 for z position (depth)
         }
 
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const material = new THREE.LineBasicMaterial({
-          color: Math.random() * 0xffffff,
+          color: 0xffffff,
           linewidth: 1,
         });
         const line = new THREE.Line(geometry, material);
