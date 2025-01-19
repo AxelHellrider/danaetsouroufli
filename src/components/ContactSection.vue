@@ -1,33 +1,27 @@
 <template>
   <section id="contact" class="contact-section">
-    <h2>Contact Me</h2>
-    <p>If you’d like to work together or say hello, feel free to reach out!</p>
-    <form @submit.prevent="handleSubmit">
-      <input type="text" placeholder="Your Name" v-model="form.name" required />
-      <input type="email" placeholder="Your Email" v-model="form.email" required />
-      <textarea placeholder="Your Message" v-model="form.message" required></textarea>
-      <button type="submit">Send Message</button>
-    </form>
+    <div>
+      <h2 class="title">Contact Me</h2>
+      <p>If you’d like to work together or say hello, feel free to reach out!</p>
+      <span>Social Media & E-mail</span>
+    </div>
+    <footer>
+      <hr>
+      <span>Copyright {{ getCurrentYear() }} &copy; Danae Tsouroufli, All Rights Reserved.</span>
+      <hr>
+      <span>Website created by Alexandros Nomikos.</span>
+    </footer>
   </section>
 </template>
 
 <script>
 export default {
   name: 'ContactSection',
-  data() {
-    return {
-      form: {
-        name: '',
-        email: '',
-        message: '',
-      },
-    };
-  },
   methods: {
-    handleSubmit() {
-      alert('Thank you for your message!');
-      this.form = { name: '', email: '', message: '' };
-    },
-  },
+    getCurrentYear() {
+      let year = new Date().getFullYear();
+      return year;
+    }
+  }
 };
 </script>

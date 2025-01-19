@@ -1,6 +1,6 @@
 <template>
   <section id="about" class="about-section">
-    <h2>About Me</h2>
+    <h2 class="title">About Me</h2>
     <p>
       Hi, I’m Danae Tsouroufli, a passionate graphic designer and book illustrator 
       with a love for bringing stories to life through visuals. My journey in 

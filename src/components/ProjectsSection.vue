@@ -1,6 +1,6 @@
 <template>
   <section id="projects" class="projects-section">
-    <h2>My Projects</h2>
+    <h2 class="title">My Projects</h2>
     <div class="category-tabs">
       <button 
         v-for="category in categories" 
@@ -17,8 +17,8 @@
         :key="index" 
         class="project-card"
       >
-        <img :src="project.image" :alt="project.title" />
-        <h3>{{ project.title }}</h3>
+        <img :src="getImageURL(project.image)" :alt="project.title" />
+        <h3 class="title">{{ project.title }}</h3>
         <p>{{ project.description }}</p>
         <span class="tag">{{ project.type }}</span>
       </div>
@@ -33,57 +33,11 @@ export default {
     return {
       activeCategory: "Animation",
       categories: [
-        { name: "Animation" },
-        { name: "Graphic Design" },
-        { name: "Illustration" },
+        { name: "Animation", folderId: "ANIMATION_FOLDER_ID" }, // Replace with actual folder ID
+        { name: "Graphic Design", folderId: "GRAPHIC_DESIGN_FOLDER_ID" }, // Replace with actual folder ID
+        { name: "Illustration", folderId: "ILLUSTRATION_FOLDER_ID" }, // Replace with actual folder ID
       ],
-      projects: [
-        // Animation projects
-        {
-          category: "Animation",
-          type: "2D",
-          title: "2D Animated Short",
-          description: "A hand-drawn animated short film.",
-          image: "/assets/images/2d-animation.jpg",
-        },
-        {
-          category: "Animation",
-          type: "3D",
-          title: "3D Character Animation",
-          description: "A 3D animated character walkthrough.",
-          image: "/assets/images/3d-animation.jpg",
-        },
-        // Graphic Design projects
-        {
-          category: "Graphic Design",
-          type: "2D",
-          title: "Brand Identity Package",
-          description: "A complete branding guide for a studio.",
-          image: "/assets/images/branding.jpg",
-        },
-        {
-          category: "Graphic Design",
-          type: "3D",
-          title: "3D Logo Design",
-          description: "A modern logo rendered in 3D.",
-          image: "/assets/images/3d-logo.jpg",
-        },
-        // Illustration projects
-        {
-          category: "Illustration",
-          type: "2D",
-          title: "Children's Book Illustration",
-          description: "Hand-drawn illustrations for a children's story.",
-          image: "/assets/images/childrens-book.jpg",
-        },
-        {
-          category: "Illustration",
-          type: "3D",
-          title: "3D Environment Art",
-          description: "A 3D-rendered fantasy landscape.",
-          image: "/assets/images/3d-landscape.jpg",
-        },
-      ],
+      projects: [],
     };
   },
   computed: {
@@ -96,7 +50,47 @@ export default {
   methods: {
     setActiveCategory(category) {
       this.activeCategory = category;
+      this.fetchProjectsByCategory(category);
     },
+
+    // Fetch projects from Google Drive based on the folder ID
+    async fetchProjectsByCategory(category) {
+      const folderId = this.categories.find(c => c.name === category).folderId;
+      try {
+        const response = await fetch(`https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents&key=YOUR_API_KEY`);
+        const data = await response.json();
+        
+        this.projects = data.files.map(file => ({
+          category: category,
+          type: this.getFileType(file.name), // Extract type from filename or metadata
+          title: file.name,
+          description: `${file.name} description`, // You can enhance this by adding metadata or a specific description field
+          image: file.id,
+        }));
+      } catch (error) {
+        console.error("Error fetching files from Google Drive:", error);
+      }
+    },
+
+    // Dynamically generate the image URL from the fileId
+    getImageURL(fileId) {
+      return `https://drive.google.com/uc?export=view&id=${fileId}`;
+    },
+
+    // Example method to extract project type from filename (you can adjust this based on your naming conventions)
+    getFileType(fileName) {
+      if (fileName.includes("2D")) {
+        return "2D";
+      } else if (fileName.includes("3D")) {
+        return "3D";
+      } else {
+        return "Unknown";
+      }
+    },
+  },
+
+  created() {
+    this.fetchProjectsByCategory(this.activeCategory); // Fetch the initial category projects on load
   },
 };
 </script>
