@@ -2,7 +2,7 @@
   <section id="hero">
     <canvas id="heroCanvas"></canvas> <!-- For Three.js -->
     <div class="hero-content">
-      <h1>Danae Tsouroufli</h1>
+      <h1 class="title">Danae Tsouroufli</h1>
       <p>Graphic Designer & Book Illustrator</p>
       <div class="cta-buttons">
         <button @click="scrollToPortfolio">View Portfolio</button>
@@ -101,15 +101,15 @@ export default {
 
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
         const material = new THREE.LineBasicMaterial({
-          color: 0xffffff,
-          linewidth: 1,
+          color: Math.random() * 0x00fcfc,
+          linewidth: 1.5,
         });
         const line = new THREE.Line(geometry, material);
 
         // Store wave's properties for later animation
         line.userData = {
           offsetX,       // The initial horizontal offset for each wave
-          velocityX: Math.random() * 0.5 - 0.25, // Horizontal movement speed
+          velocityX: Math.random() * 0.075, // Horizontal movement speed
         };
 
         scene.add(line);
@@ -146,10 +146,8 @@ export default {
 
         renderer.render(scene, camera);
       };
-
       animate();
 
-      // Handle window resizing
       window.addEventListener("resize", () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
