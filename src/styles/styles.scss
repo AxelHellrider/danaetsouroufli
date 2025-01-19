@@ -28,10 +28,13 @@ body {
   }
   
   // Hero Section
-  #hero {
+  section {
     position: relative;
     height: 100vh;
     overflow: hidden;
+  }
+
+  #hero {
     display: flex;
     align-items: center;
     justify-content: center;
