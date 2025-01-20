@@ -1,7 +1,6 @@
 <template>
   <section id="projects" class="projects-section">
     <h2 class="title">My Projects</h2>
-    <h2 class="title">My Projects</h2>
     <div class="category-tabs">
       <button 
         v-for="category in categories" 
@@ -20,8 +19,6 @@
       >
         <img :src="getImageURL(project.image)" :alt="project.title" />
         <h3 class="title">{{ project.title }}</h3>
-        <img :src="getImageURL(project.image)" :alt="project.title" />
-        <h3 class="title">{{ project.title }}</h3>
         <p>{{ project.description }}</p>
         <span class="tag">{{ project.type }}</span>
       </div>
@@ -30,8 +27,6 @@
 </template>
 
 <script>
-import { log } from 'three/tsl';
-
 export default {
   name: 'ProjectsSection',
   data() {
@@ -39,8 +34,8 @@ export default {
       activeCategory: "Animation",
       categories: [
         { name: "Animation", folderId: '1O3FZspn-Kv6espDh3x4Kats4JdV7GWTK' },
-        { name: "Graphic Design", folderId: 'your-folder-id-graphic-design' },
-        { name: "Illustration", folderId: 'your-folder-id-illustration' },
+        { name: "Graphic Design", folderId: '1AUGL_HlYPrpnh7jgHQWPY8H_6fcKoTZB' },
+        { name: "Illustration", folderId: '1tdXBf3wIWU1Z1mR6SGlQ6Clr5ngSrdXF' },
       ],
       projects: []
     };
@@ -50,8 +45,7 @@ export default {
       try {
         const response = await fetch(`/.netlify/functions/getGoogleDriveFiles?folderId=${folderId}`);
         const files = await response.json();
-        console.log("Fetched files:", files);
-
+        
         this.projects = files.map(file => ({
           category: this.activeCategory,
           title: file.name || 'Untitled',
