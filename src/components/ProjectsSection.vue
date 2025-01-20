@@ -28,69 +28,44 @@
 
 <script>
 export default {
-  name: "ProjectsSection",
+  name: 'ProjectsSection',
   data() {
     return {
       activeCategory: "Animation",
       categories: [
-        { name: "Animation", folderId: "ANIMATION_FOLDER_ID" }, // Replace with actual folder ID
-        { name: "Graphic Design", folderId: "GRAPHIC_DESIGN_FOLDER_ID" }, // Replace with actual folder ID
-        { name: "Illustration", folderId: "ILLUSTRATION_FOLDER_ID" }, // Replace with actual folder ID
+        { name: "Animation", folderId: '1O3FZspn-Kv6espDh3x4Kats4JdV7GWTK' },
+        { name: "Graphic Design", folderId: '1AUGL_HlYPrpnh7jgHQWPY8H_6fcKoTZB' },
+        { name: "Illustration", folderId: '1tdXBf3wIWU1Z1mR6SGlQ6Clr5ngSrdXF' },
       ],
-      projects: [],
+      projects: []
     };
+  },
+  methods: {
+    async fetchProjectsByCategory(folderId) {
+      try {
+        const response = await fetch(`/.netlify/functions/getGoogleDriveFiles?folderId=${folderId}`);
+        const files = await response.json();
+        
+        this.projects = files.map(file => ({
+          category: this.activeCategory,
+          title: file.name || 'Untitled',
+          description: 'No description available',
+          image: `https://drive.google.com/uc?export=view&id=${file.id}`,
+        }));
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    },
+    setActiveCategory(category) {
+      this.activeCategory = category;
+      const folderId = this.categories.find(c => c.name === category).folderId;
+      this.fetchProjectsByCategory(folderId);
+    }
   },
   computed: {
     filteredProjects() {
-      return this.projects.filter(
-        (project) => project.category === this.activeCategory
-      );
-    },
-  },
-  methods: {
-    setActiveCategory(category) {
-      this.activeCategory = category;
-      this.fetchProjectsByCategory(category);
-    },
-
-    // Fetch projects from Google Drive based on the folder ID
-    async fetchProjectsByCategory(category) {
-      const folderId = this.categories.find(c => c.name === category).folderId;
-      try {
-        const response = await fetch(`https://www.googleapis.com/drive/v3/files?q='${folderId}' in parents&key=YOUR_API_KEY`);
-        const data = await response.json();
-        
-        this.projects = data.files.map(file => ({
-          category: category,
-          type: this.getFileType(file.name), // Extract type from filename or metadata
-          title: file.name,
-          description: `${file.name} description`, // You can enhance this by adding metadata or a specific description field
-          image: file.id,
-        }));
-      } catch (error) {
-        console.error("Error fetching files from Google Drive:", error);
-      }
-    },
-
-    // Dynamically generate the image URL from the fileId
-    getImageURL(fileId) {
-      return `https://drive.google.com/uc?export=view&id=${fileId}`;
-    },
-
-    // Example method to extract project type from filename (you can adjust this based on your naming conventions)
-    getFileType(fileName) {
-      if (fileName.includes("2D")) {
-        return "2D";
-      } else if (fileName.includes("3D")) {
-        return "3D";
-      } else {
-        return "Unknown";
-      }
-    },
-  },
-
-  created() {
-    this.fetchProjectsByCategory(this.activeCategory); // Fetch the initial category projects on load
+      return this.projects.filter(project => project.category === this.activeCategory);
+    }
   },
 };
 </script>
