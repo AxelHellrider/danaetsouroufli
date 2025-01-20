@@ -1,6 +1,7 @@
 <template>
   <section id="projects" class="projects-section">
     <h2 class="title">My Projects</h2>
+    <h2 class="title">My Projects</h2>
     <div class="category-tabs">
       <button 
         v-for="category in categories" 
@@ -17,6 +18,8 @@
         :key="index" 
         class="project-card"
       >
+        <img :src="getImageURL(project.image)" :alt="project.title" />
+        <h3 class="title">{{ project.title }}</h3>
         <img :src="getImageURL(project.image)" :alt="project.title" />
         <h3 class="title">{{ project.title }}</h3>
         <p>{{ project.description }}</p>
