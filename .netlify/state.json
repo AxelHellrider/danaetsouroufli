@@ -1,0 +1,20 @@
+{
+	"geolocation": {
+		"data": {
+			"city": "Athens",
+			"country": {
+				"code": "GR",
+				"name": "Greece"
+			},
+			"subdivision": {
+				"code": "I",
+				"name": "Attica"
+			},
+			"timezone": "Europe/Athens",
+			"latitude": 37.9842,
+			"longitude": 23.7353
+		},
+		"timestamp": 1737319263989
+	},
+	"siteId": "b454c40a-8b34-4a67-bb74-e57b5e8918db"
+}
