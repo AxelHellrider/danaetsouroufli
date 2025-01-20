@@ -12,12 +12,13 @@
       </button>
     </div>
     <div class="projects-gallery">
-      <div 
-        v-for="(project, index) in filteredProjects" 
-        :key="index" 
-        class="project-card"
-      >
-        <img :src="getImageURL(project.image)" :alt="project.title" />
+      <div v-for="(project, index) in filteredProjects" :key="index" class="project-card">
+        <div v-if="project.type.includes('video')">
+          <video controls :src="project.mediaUrl" :alt="project.title"></video>
+        </div>
+        <div v-else>
+          <img :src="project.mediaUrl" :alt="project.title" />
+        </div>
         <h3 class="title">{{ project.title }}</h3>
         <p>{{ project.description }}</p>
         <span class="tag">{{ project.type }}</span>
@@ -45,21 +46,59 @@ export default {
       try {
         const response = await fetch(`/.netlify/functions/getGoogleDriveFiles?folderId=${folderId}`);
         const files = await response.json();
-        
-        this.projects = files.map(file => ({
-          category: this.activeCategory,
-          title: file.name || 'Untitled',
-          description: 'No description available',
-          image: `https://drive.google.com/uc?export=view&id=${file.id}`,
-        }));
+
+        console.log('API Response:', files);  // Log the full response to see its structure
+
+        this.projects = files.map(file => {
+          if (file.mimeType !== "application/vnd.google-apps.folder") {
+            return {
+              category: this.activeCategory,
+              title: file.name || 'Untitled',
+              description: file.description || 'No description available.',
+              mediaUrl: file.mimeType !== "video/mp4"?this.getFileURL(file.id, 'image/jpeg'):this.getFileURL(file.id, 'video/mp4'),
+              type: file.mimeType,
+            };
+          }
+        }).filter(project => project !== null);
       } catch (error) {
         console.error('Error fetching projects:', error);
       }
     },
+    async fetchFilesInFolder(folderId) {
+      let files = [];
+      try {
+        const response = await fetch(`/.netlify/functions/getGoogleDriveFiles?folderId=${folderId}`);
+        const fileList = await response.json();
+
+        for (const file of fileList) {
+          if (file.mimeType === "application/vnd.google-apps.folder") {
+            const subFolderFiles = await this.fetchFilesInFolder(file.id);
+            files = files.concat(subFolderFiles); // Merge results
+          } else {
+            files.push(file);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching files from folder:', error);
+      };
+      return files;
+    },
+
     setActiveCategory(category) {
       this.activeCategory = category;
       const folderId = this.categories.find(c => c.name === category).folderId;
       this.fetchProjectsByCategory(folderId);
+    },
+
+    getFileURL(fileId, mimeType) {
+      if (mimeType.includes('video')) {
+        // For videos, return the video URL
+        return `https://drive.google.com/uc?id=${fileId}&export=view`;
+      } else if (mimeType.includes('image')) {
+        // For images, return the image URL
+        return `https://drive.google.com/uc?id=${fileId}&export=view`;
+      }
+      return '';  // Fallback URL (you can handle this case differently)
     }
   },
   computed: {
