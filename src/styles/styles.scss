@@ -123,6 +123,8 @@ body {
     border-radius: 10px;
     transition: transform 0.3s;
   }
+
+  .project-card * {text-align: center;}
   
   .project-card:hover {
     transform: scale(1.05);
@@ -135,7 +137,8 @@ body {
   
   .project-card h3 {
     margin-top: 15px;
-    font-size: 1.5rem;
+    font-size: 1rem;
+    padding: 5px;
   }
   
   .project-card p {
