@@ -3,7 +3,7 @@
     <canvas id="heroCanvas"></canvas> <!-- For Three.js -->
     <div class="hero-content">
       <h1 class="title">Danae Tsouroufli</h1>
-      <p>Graphic Designer & Book Illustrator</p>
+      <p>Graphic Designer - Illustrator - 3D Artist</p>
       <div class="cta-buttons">
         <button @click="scrollToPortfolio">View Portfolio</button>
         <button @click="scrollToContact">Contact Me</button>

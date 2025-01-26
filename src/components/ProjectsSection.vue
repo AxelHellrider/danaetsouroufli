@@ -11,7 +11,13 @@
         {{ category.name }}
       </button>
     </div>
-    <div class="projects-gallery">
+
+    <!-- Loading Indicator -->
+    <div v-if="loading" class="loading-spinner">
+      <span>Loading...</span>
+    </div>
+
+    <div class="projects-gallery" v-if="!loading">
       <div v-for="(project, index) in filteredProjects" :key="index" class="project-card">
         <div v-if="project.type.includes('video')">
           <video controls :src="project.mediaUrl" :alt="project.title"></video>
@@ -21,7 +27,6 @@
         </div>
         <h3 class="title">{{ project.title }}</h3>
         <p>{{ project.description }}</p>
-        <span class="tag">{{ project.type }}</span>
       </div>
     </div>
   </section>
@@ -38,30 +43,36 @@ export default {
         { name: "Graphic Design", folderId: '1AUGL_HlYPrpnh7jgHQWPY8H_6fcKoTZB' },
         { name: "Illustration", folderId: '1tdXBf3wIWU1Z1mR6SGlQ6Clr5ngSrdXF' },
       ],
-      projects: []
+      projects: [],
+      loading: false,
+      cachedProjects: {}  // Cache to store the projects for each category
     };
   },
   methods: {
     async fetchProjectsByCategory(folderId) {
+      if (this.cachedProjects[folderId]) {
+        // If data is cached, use it directly
+        this.projects = this.cachedProjects[folderId];
+        return;
+      }
+
+      this.loading = true;
       try {
-        const response = await fetch(`/.netlify/functions/getGoogleDriveFiles?folderId=${folderId}`);
-        const files = await response.json();
+        const files = await this.fetchFilesInFolder(folderId);
+        const projectData = files.map(file => ({
+          category: this.activeCategory,
+          title: file.name || 'Untitled',
+          description: file.description || 'No description available.',
+          mediaUrl: this.getFileURL(file.id),
+        }));
 
-        console.log('API Response:', files);  // Log the full response to see its structure
-
-        this.projects = files.map(file => {
-          if (file.mimeType !== "application/vnd.google-apps.folder") {
-            return {
-              category: this.activeCategory,
-              title: file.name || 'Untitled',
-              description: file.description || 'No description available.',
-              mediaUrl: file.mimeType !== "video/mp4"?this.getFileURL(file.id, 'image/jpeg'):this.getFileURL(file.id, 'video/mp4'),
-              type: file.mimeType,
-            };
-          }
-        }).filter(project => project !== null);
+        // Cache the data for future use
+        this.cachedProjects[folderId] = projectData;
+        this.projects = projectData;
       } catch (error) {
         console.error('Error fetching projects:', error);
+      } finally {
+        this.loading = false;
       }
     },
     async fetchFilesInFolder(folderId) {
@@ -75,36 +86,32 @@ export default {
             const subFolderFiles = await this.fetchFilesInFolder(file.id);
             files = files.concat(subFolderFiles); // Merge results
           } else {
-            files.push(file);
+            files.push(file); // Only add files
           }
         }
       } catch (error) {
         console.error('Error fetching files from folder:', error);
-      };
+      }
       return files;
     },
-
     setActiveCategory(category) {
       this.activeCategory = category;
       const folderId = this.categories.find(c => c.name === category).folderId;
-      this.fetchProjectsByCategory(folderId);
+      this.fetchProjectsByCategory(folderId); // Fetch only when the category is first accessed
     },
-
-    getFileURL(fileId, mimeType) {
-      if (mimeType.includes('video')) {
-        // For videos, return the video URL
-        return `https://drive.google.com/uc?id=${fileId}&export=view`;
-      } else if (mimeType.includes('image')) {
-        // For images, return the image URL
-        return `https://drive.google.com/uc?id=${fileId}&export=view`;
-      }
-      return '';  // Fallback URL (you can handle this case differently)
-    }
+    getFileURL(fileId) {
+      return `https://lh3.googleusercontent.com/d/${fileId}?authuser=0`;
+    },
   },
   computed: {
     filteredProjects() {
       return this.projects.filter(project => project.category === this.activeCategory);
     }
   },
+  mounted() {
+    const folderId = this.categories.find(c => c.name === this.activeCategory).folderId;
+    this.fetchProjectsByCategory(folderId); // Fetch when the component is mounted
+  },
 };
 </script>
+
