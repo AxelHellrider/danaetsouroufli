@@ -19,7 +19,7 @@
 
     <div class="projects-gallery" v-if="!loading">
       <div v-for="(project, index) in filteredProjects" :key="index" class="project-card">
-        <div v-if="project.type.includes('video')">
+        <div v-if="project.type === 'video'">
           <video controls :src="project.mediaUrl" :alt="project.title"></video>
         </div>
         <div v-else>
@@ -27,7 +27,6 @@
         </div>
         <h3 class="title">{{ project.title }}</h3>
         <p>{{ project.description }}</p>
-        <span class="tag">{{ project.type }}</span>
       </div>
     </div>
   </section>
@@ -40,9 +39,9 @@ export default {
     return {
       activeCategory: "Animation",
       categories: [
-        { name: "Animation", folderId: '1O3FZspn-Kv6espDh3x4Kats4JdV7GWTK' },
-        { name: "Graphic Design", folderId: '1AUGL_HlYPrpnh7jgHQWPY8H_6fcKoTZB' },
-        { name: "Illustration", folderId: '1tdXBf3wIWU1Z1mR6SGlQ6Clr5ngSrdXF' },
+        { name: "Animation", folderPath: '3D_Animation' },
+        { name: "Graphic Design", folderPath: 'Graphics_Design' },
+        { name: "Illustration", folderPath: 'Illustrations' },
       ],
       projects: [],
       loading: false,
@@ -50,26 +49,29 @@ export default {
     };
   },
   methods: {
-    async fetchProjectsByCategory(folderId) {
-      if (this.cachedProjects[folderId]) {
-        // If data is cached, use it directly
-        this.projects = this.cachedProjects[folderId];
+    async fetchProjectsByCategory(folderPath) {
+      // Check if the category is already cached
+      if (this.cachedProjects[folderPath]) {
+        this.projects = this.cachedProjects[folderPath];
         return;
       }
 
       this.loading = true;
       try {
-        const files = await this.fetchFilesInFolder(folderId);
+        // Fetch project metadata from a local JSON file or predefined data
+        const response = await fetch(`/.netlify/blobs-serve/${folderPath}/metadata.json`);
+        const files = await response.json();
+
         const projectData = files.map(file => ({
           category: this.activeCategory,
-          title: file.name || 'Untitled',
+          title: file.title || 'Untitled',
           description: file.description || 'No description available.',
-          mediaUrl: this.getFileURL(file.id),
-          type: file.mimeType,
+          mediaUrl: this.getBlobURL(folderPath, file.fileName),
+          type: file.type || (file.fileName.endsWith('.mp4') ? 'video' : 'image'),
         }));
 
-        // Cache the data for future use
-        this.cachedProjects[folderId] = projectData;
+        // Cache the projects
+        this.cachedProjects[folderPath] = projectData;
         this.projects = projectData;
       } catch (error) {
         console.error('Error fetching projects:', error);
@@ -77,30 +79,13 @@ export default {
         this.loading = false;
       }
     },
-    async fetchFilesInFolder(folderId) {
-      let files = [];
-      try {
-        const response = await fetch(`/.netlify/functions/getGoogleDriveFiles?folderId=${folderId}`);
-        const fileList = await response.json();
-
-        for (const file of fileList) {
-          if (file.mimeType === "application/vnd.google-apps.folder") {
-            const subFolderFiles = await this.fetchFilesInFolder(file.id);
-            files = files.concat(subFolderFiles); // Merge results
-          } else files.push(file);
-        }
-      } catch (error) {
-        console.error('Error fetching files from folder:', error);
-      }
-      return files;
+    getBlobURL(folderPath, fileName) {
+      return `/.netlify/blobs-serve/${folderPath}/${fileName}`;
     },
     setActiveCategory(category) {
       this.activeCategory = category;
-      const folderId = this.categories.find(c => c.name === category).folderId;
-      this.fetchProjectsByCategory(folderId); // Fetch only when the category is first accessed
-    },
-    getFileURL(fileId) {
-      return `https://lh3.googleusercontent.com/d/${fileId}?authuser=0`;
+      const folderPath = this.categories.find(c => c.name === category).folderPath;
+      this.fetchProjectsByCategory(folderPath); // Fetch projects when the category is first accessed
     },
   },
   computed: {
@@ -109,9 +94,8 @@ export default {
     }
   },
   mounted() {
-    const folderId = this.categories.find(c => c.name === this.activeCategory).folderId;
-    this.fetchProjectsByCategory(folderId); // Fetch when the component is mounted
+    const folderPath = this.categories.find(c => c.name === this.activeCategory).folderPath;
+    this.fetchProjectsByCategory(folderPath); // Fetch initial projects when the component is mounted
   },
 };
 </script>
-
