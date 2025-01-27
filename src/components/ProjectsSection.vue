@@ -27,6 +27,7 @@
         </div>
         <h3 class="title">{{ project.title }}</h3>
         <p>{{ project.description }}</p>
+        <span class="tag">{{ project.type }}</span>
       </div>
     </div>
   </section>
@@ -64,6 +65,7 @@ export default {
           title: file.name || 'Untitled',
           description: file.description || 'No description available.',
           mediaUrl: this.getFileURL(file.id),
+          type: file.mimeType,
         }));
 
         // Cache the data for future use
@@ -85,9 +87,7 @@ export default {
           if (file.mimeType === "application/vnd.google-apps.folder") {
             const subFolderFiles = await this.fetchFilesInFolder(file.id);
             files = files.concat(subFolderFiles); // Merge results
-          } else {
-            files.push(file); // Only add files
-          }
+          } else files.push(file);
         }
       } catch (error) {
         console.error('Error fetching files from folder:', error);

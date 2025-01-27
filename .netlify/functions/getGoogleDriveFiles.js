@@ -26,10 +26,7 @@ exports.handler = async (event) => {
   
   try {
     const files = await fetchWithRetry(url, 3); // Retry 3 times if needed
-
-    // Store result in cache to minimize future requests
     cache[folderId] = files;
-
     return {
       statusCode: 200,
       body: JSON.stringify(files),
