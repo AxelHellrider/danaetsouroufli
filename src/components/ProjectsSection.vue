@@ -59,7 +59,7 @@ export default {
       this.loading = true;
       try {
         // Fetch project metadata from a local JSON file or predefined data
-        const response = await fetch(`https://danaetsouroufli.art/.netlify/blobs-serve/${folderPath}/metadata.json`);
+        const response = await fetch(`/.netlify/blobs-serve/${folderPath}/metadata.json`);
         const files = await response.json();
 
         const projectData = files.map(file => ({
@@ -80,7 +80,7 @@ export default {
       }
     },
     getBlobURL(folderPath, fileName) {
-      return `https://danaetsouroufli.art/.netlify/blobs-serve/${folderPath}/${fileName}`;
+      return `/.netlify/blobs-serve/${folderPath}/${fileName}`;
     },
     setActiveCategory(category) {
       this.activeCategory = category;
