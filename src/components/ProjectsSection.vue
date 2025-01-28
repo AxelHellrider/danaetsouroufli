@@ -59,14 +59,14 @@ export default {
       this.loading = true;
       try {
         // Fetch project metadata from a local JSON file or predefined data
-        const response = await fetch(`/.netlify/blobs-serve/${folderPath}/metadata.json`);
+        const response = await fetch(`/${folderPath}/metadata.json`);
         const files = await response.json();
 
         const projectData = files.map(file => ({
           category: this.activeCategory,
           title: file.title || 'Untitled',
           description: file.description || 'No description available.',
-          mediaUrl: this.getBlobURL(folderPath, file.fileName),
+          mediaUrl: this.getBlobURL(folderPath, file.fileName), // Using the correct URL
           type: file.type || (file.fileName.endsWith('.mp4') ? 'video' : 'image'),
         }));
 
@@ -80,7 +80,7 @@ export default {
       }
     },
     getBlobURL(folderPath, fileName) {
-      return `/.netlify/blobs-serve/${folderPath}/${fileName}`;
+      return `/${folderPath}/${fileName}`;
     },
     setActiveCategory(category) {
       this.activeCategory = category;
