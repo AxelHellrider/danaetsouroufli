@@ -1,6 +1,6 @@
 <template>
-  <section id="contact" class="contact-section">
-    <div>
+  <section class="contact-section">
+    <div id="contact">
       <h2 class="title">Contact Me</h2>
       <p>If you’d like to work together or say hello, feel free to reach out!</p>
     </div>
@@ -15,22 +15,48 @@
           <a href="mailto:danaetsouroufli@outlook.com">Danae Tsouroufli @ Outlook</a>
         </div>
       </div>
-      <hr>
-      <span>Copyright {{ getCurrentYear() }} &copy; Danae Tsouroufli, All Rights Reserved.</span>
-      <hr>
+      <hr />
+      <span
+        >Copyright {{ getCurrentYear() }} &copy; Danae Tsouroufli, All Rights
+        Reserved.</span
+      >
+      <hr />
       <span>Website created by Alexandros Nomikos.</span>
+      <button class="scroll-top" @click="smoothScrollToTop" v-show="showScrollButton">
+        Back to top
+      </button>
     </footer>
   </section>
 </template>
 
 <script>
 export default {
-  name: 'ContactSection',
+  name: "ContactSection",
+  data() {
+    return {
+      showScrollButton: false, // Controls button visibility
+    };
+  },
   methods: {
     getCurrentYear() {
-      let year = new Date().getFullYear();
-      return year;
-    }
-  }
+      return new Date().getFullYear();
+    },
+    handleScroll() {
+      // Show button only when scrolled away from the top
+      this.showScrollButton = window.scrollY > 100;
+    },
+    smoothScrollToTop() {
+      // Smoothly scroll to the top of the page
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+  },
+  mounted() {
+    // Add scroll event listener when the component is mounted
+    window.addEventListener("scroll", this.handleScroll);
+  },
+  beforeDestroy() {
+    // Remove the event listener when the component is destroyed
+    window.removeEventListener("scroll", this.handleScroll);
+  },
 };
 </script>

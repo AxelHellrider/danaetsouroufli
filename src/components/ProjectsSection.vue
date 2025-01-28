@@ -33,7 +33,7 @@
     <div v-if="preview" class="preview-overlay" @click="closePreview">
       <div class="preview-content" @click.stop>
         <div v-if="previewProject.type === 'video'">
-          <video controls :src="previewProject.mediaUrl" :alt="previewProject.title" />
+          <video controls muted :src="previewProject.mediaUrl" :alt="previewProject.title" />
         </div>
         <div v-else>
           <img :src="previewProject.mediaUrl" :alt="previewProject.title" />
