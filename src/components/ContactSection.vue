@@ -15,12 +15,8 @@
           <a href="mailto:danaetsouroufli@outlook.com">Danae Tsouroufli @ Outlook</a>
         </div>
       </div>
-      <hr />
-      <span
-        >Copyright {{ getCurrentYear() }} &copy; Danae Tsouroufli, All Rights
-        Reserved.</span
-      >
-      <hr />
+      <span>Copyright {{ getCurrentYear() }} &copy; Danae Tsouroufli, All Rights
+        Reserved.</span>
       <span>Website created by Alexandros Nomikos.</span>
       <button class="scroll-top" @click="smoothScrollToTop" v-show="showScrollButton">
         Back to top
