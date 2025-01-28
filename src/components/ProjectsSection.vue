@@ -18,15 +18,27 @@
     </div>
 
     <div class="projects-gallery" v-if="!loading">
-      <div v-for="(project, index) in filteredProjects" :key="index" class="project-card">
+      <div v-for="(project, index) in filteredProjects" :key="index" class="project-card" @click="openPreview(project)">
         <div v-if="project.type === 'video'">
           <video controls :src="project.mediaUrl" :alt="project.title"></video>
         </div>
         <div v-else>
-          <img :src="project.mediaUrl" :alt="project.title" />
+          <img :src="project.mediaUrl" :alt="project.title"/>
         </div>
         <h3 class="title">{{ project.title }}</h3>
         <p>{{ project.description }}</p>
+      </div>
+    </div>
+
+    <div v-if="preview" class="preview-overlay" @click="closePreview">
+      <div class="preview-content" @click.stop>
+        <div v-if="previewProject.type === 'video'">
+          <video controls :src="previewProject.mediaUrl" :alt="previewProject.title" />
+        </div>
+        <div v-else>
+          <img :src="previewProject.mediaUrl" :alt="previewProject.title" />
+        </div>
+        <button class="close-btn" @click="closePreview">Close</button>
       </div>
     </div>
   </section>
@@ -45,7 +57,9 @@ export default {
       ],
       projects: [],
       loading: false,
-      cachedProjects: {}  // Cache to store the projects for each category
+      cachedProjects: {},
+      preview: false,
+      previewProject: null, 
     };
   },
   methods: {
@@ -86,6 +100,14 @@ export default {
       this.activeCategory = category;
       const folderPath = this.categories.find(c => c.name === category).folderPath;
       this.fetchProjectsByCategory(folderPath); // Fetch projects when the category is first accessed
+    },
+    openPreview(project) {
+      this.previewProject = project;
+      this.preview = true;
+    },
+    closePreview() {
+      this.preview = false;
+      this.previewProject = null;
     },
   },
   computed: {
