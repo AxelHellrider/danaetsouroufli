@@ -80,7 +80,7 @@ export default {
       }
     },
     getBlobURL(folderPath, fileName) {
-      return `/.netlify/blobs-serve/${folderPath}/${fileName}`;
+      return `https://danaetsouroufli.art/.netlify/blobs-serve/${folderPath}/${fileName}`;
     },
     setActiveCategory(category) {
       this.activeCategory = category;
