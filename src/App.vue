@@ -1,5 +1,5 @@
 <template>
-  <video autoplay muted loop id="myVideo">
+  <video autoplay muted loop playsinline id="myVideo">
     <source src="../public/3D_Animation/Synthwave Path.mp4" type="video/mp4">
   </video>
   <HeroSection />
@@ -21,5 +21,11 @@ export default {
     ProjectsSection,
     ContactSection,
   },
+  mounted() {
+    document.addEventListener('DOMContentLoaded', function() {
+      var video = document.getElementById('myVideo');
+      video.play();
+    });
+  }
 };
 </script>
