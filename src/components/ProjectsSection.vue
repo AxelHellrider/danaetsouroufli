@@ -33,7 +33,7 @@
     <div v-if="preview" class="preview-overlay" @click="closePreview">
       <div class="preview-content" @click.stop>
         <div v-if="previewProject.type === 'video'">
-          <video controls muted :src="previewProject.mediaUrl" :alt="previewProject.title" />
+          <video controls muted allowfullscreen="false" :src="previewProject.mediaUrl" :alt="previewProject.title" />
         </div>
         <div v-else>
           <img :src="previewProject.mediaUrl" :alt="previewProject.title" />
@@ -103,10 +103,12 @@ export default {
     },
     openPreview(project) {
       this.previewProject = project;
+      document.body.style.overflow = "hidden";
       this.preview = true;
     },
     closePreview() {
       this.preview = false;
+      document.body.style.overflow = "auto";
       this.previewProject = null;
     },
   },
