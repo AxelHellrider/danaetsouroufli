@@ -6,3 +6,18 @@
 
 [functions]
   node_bundler = "esbuild"
+
+[[headers]]
+  for = "/3D_Animation/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, immutable"
+
+[[headers]]
+  for = "/Graphics_Design/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, immutable"
+
+[[headers]]
+  for = "/Illustrations/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, immutable"
