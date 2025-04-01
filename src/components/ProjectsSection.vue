@@ -23,7 +23,7 @@
           <video controls preload="metadata" :src="project.mediaUrl" :alt="project.title"></video>
         </div>
         <div v-else>
-          <img loading="lazy" :src="project.mediaUrl" :alt="project.title"/>
+          <img :src="project.mediaUrl" :alt="project.title" loading="lazy"/>
         </div>
         <h3 class="title">{{ project.title }}</h3>
         <p>{{ project.description }}</p>
@@ -33,10 +33,10 @@
     <div v-if="preview" class="preview-overlay" @click="closePreview">
       <div class="preview-content" @click.stop>
         <div v-if="previewProject.type === 'video'">
-          <video controls preload="metadata" muted allowfullscreen="false" :src="previewProject.mediaUrl" :alt="previewProject.title" />
+          <video controls muted preload="metadata" allowfullscreen="false" :src="previewProject.mediaUrl" :alt="previewProject.title" />
         </div>
         <div v-else>
-          <img loading="lazy" :src="previewProject.mediaUrl" :alt="previewProject.title" />
+          <img :src="previewProject.mediaUrl" :alt="previewProject.title"  loading="lazy"/>
         </div>
         <button class="close-btn" @click="closePreview">Close</button>
       </div>
@@ -63,27 +63,16 @@ export default {
     };
   },
   methods: {
-    async getBlobURL(folderPath, fileName) {
-      const fileUrl = `/${folderPath}/${fileName}`;
-      if (sessionStorage.getItem(fileUrl)) return sessionStorage.getItem(fileUrl);
-
-      const response = await fetch(fileUrl);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-
-      sessionStorage.setItem(fileUrl, blobUrl);
-      return blobUrl;
-    },
     async fetchProjectsByCategory(folderPath) {
-      // Check sessionStorage first
-      const cachedData = sessionStorage.getItem(folderPath);
-      if (cachedData) {
-        this.projects = JSON.parse(cachedData);
+      // Check if the category is already cached
+      if (this.cachedProjects[folderPath]) {
+        this.projects = this.cachedProjects[folderPath];
         return;
       }
 
       this.loading = true;
       try {
+        // Fetch project metadata from a local JSON file or predefined data
         const response = await fetch(`/${folderPath}/metadata.json`);
         const files = await response.json();
 
@@ -91,12 +80,12 @@ export default {
           category: this.activeCategory,
           title: file.title || 'Untitled',
           description: file.description || 'No description available.',
-          mediaUrl: this.getBlobURL(folderPath, file.fileName),
+          mediaUrl: this.getBlobURL(folderPath, file.fileName), // Using the correct URL
           type: file.type || (file.fileName.endsWith('.mp4') ? 'video' : 'image'),
         }));
 
-        // Store in sessionStorage for persistence
-        sessionStorage.setItem(folderPath, JSON.stringify(projectData));
+        // Cache the projects
+        this.cachedProjects[folderPath] = projectData;
         this.projects = projectData;
       } catch (error) {
         console.error('Error fetching projects:', error);
@@ -104,10 +93,13 @@ export default {
         this.loading = false;
       }
     },
+    getBlobURL(folderPath, fileName) {
+      return `/${folderPath}/${fileName}`;
+    },
     setActiveCategory(category) {
       this.activeCategory = category;
       const folderPath = this.categories.find(c => c.name === category).folderPath;
-      this.fetchProjectsByCategory(folderPath);
+      this.fetchProjectsByCategory(folderPath); // Fetch projects when the category is first accessed
     },
     openPreview(project) {
       this.previewProject = project;
