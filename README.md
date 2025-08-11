@@ -6,4 +6,12 @@ Tech Stack used:
 - Vite
 - Three.js for 3d elements and some portfolio items
 
-Font used: Futura Std Bold by Bauer Type, licensed on 08/11/2025 for a year at this domain.
+## Font Licensing
+
+This project uses **Futura Std Bold** under a commercial webfont license from [Bauer Types](https://www.bauertypes.com/).
+
+- License scope: 1-year webfont license, single domain
+- License ID: #028365
+- Purchase date: 2025-08-11
+
+The license document and invoice are stored in `/licenses` (not publicly distributed).
